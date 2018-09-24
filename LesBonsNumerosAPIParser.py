@@ -31,13 +31,13 @@ class LesBonsNumerosAPIParser(object):
             result_text_data = Utils.cleanhtml(result_text_data)
             result_line_list = result_text_data.split("\n")
 
-            date = self.__extract_date_lottery__(result_line_list[1])
-            balls = self.__extract_balls__(result_line_list[2])
-            lucky_ball = self.__extract_lucky_ball__(result_line_list[3])
-            number_winner = self.__extract_number_winner__(result_line_list[11])
-            winner_prize = self.__extract_winner_prize__(result_line_list[11])
-            next_lottery_date = self.__extract_next_lottery_date__(result_line_list[12])
-            next_lottery_prize = self.__extract_next_lottery_prize__(result_line_list[12])
+            date = LesBonsNumerosAPIParser.__extract_date_lottery__(result_line_list[1])
+            balls = LesBonsNumerosAPIParser.__extract_balls__(result_line_list[2])
+            lucky_ball = LesBonsNumerosAPIParser.__extract_lucky_ball__(result_line_list[3])
+            number_winner = LesBonsNumerosAPIParser.__extract_number_winner__(result_line_list[11])
+            winner_prize = LesBonsNumerosAPIParser.__extract_winner_prize__(result_line_list[11])
+            next_lottery_date = LesBonsNumerosAPIParser.__extract_next_lottery_date__(result_line_list[12])
+            next_lottery_prize = LesBonsNumerosAPIParser.__extract_next_lottery_prize__(result_line_list[12])
 
             result = Result(string_date=date,
                             balls=balls,
@@ -69,28 +69,27 @@ class LesBonsNumerosAPIParser(object):
         winner_number = -1
         if "Le jackpot n'a pas été remporté lors de ce tirage !" in line:
             winner_number = 0
-        else:
             line = line.lower()
-            if NumbersInFrench.ONE in line:
-                winner_number = 1
-            if NumbersInFrench.TWO in line:
-                winner_number = 2
-            if NumbersInFrench.THREE in line:
-                winner_number = 3
-            if NumbersInFrench.FOUR in line:
-                winner_number = 4
-            if NumbersInFrench.FIVE in line:
-                winner_number = 5
-            if NumbersInFrench.SIX in line:
-                winner_number = 6
-            if NumbersInFrench.SEVEN in line:
-                winner_number = 7
-            if NumbersInFrench.EIGHT in line:
-                winner_number = 8
-            if NumbersInFrench.NINE in line:
-                winner_number = 9
-            if NumbersInFrench.TEN in line:
-                winner_number = 10
+        elif NumbersInFrench.ONE in line:
+            winner_number = 1
+        elif NumbersInFrench.TWO in line:
+            winner_number = 2
+        elif NumbersInFrench.THREE in line:
+            winner_number = 3
+        elif NumbersInFrench.FOUR in line:
+            winner_number = 4
+        elif NumbersInFrench.FIVE in line:
+            winner_number = 5
+        elif NumbersInFrench.SIX in line:
+            winner_number = 6
+        elif NumbersInFrench.SEVEN in line:
+            winner_number = 7
+        elif NumbersInFrench.EIGHT in line:
+            winner_number = 8
+        elif NumbersInFrench.NINE in line:
+            winner_number = 9
+        elif NumbersInFrench.TEN in line:
+            winner_number = 10
         return winner_number
 
     @staticmethod

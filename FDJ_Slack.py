@@ -23,7 +23,7 @@ class FDJSlack(object):
         for index, result in enumerate(list_result):
             if index == 0: # only first result
                 logger.info(result)
-                self.__post_to_slack__(str(result))
+                FDJSlack.__post_to_slack__(str(result))
                 if result.is_winning(WIN, LUCK_WIN):
                     print("BANCO !!")
 
