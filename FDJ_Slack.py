@@ -25,8 +25,7 @@ class FDJSlack(object):
                 logger.info(result)
                 FDJSlack.__post_to_slack__(str(result))
                 if result.is_winning(WIN, LUCK_WIN):
-                    print("BANCO !!")
-
+                    FDJSlack.__post_to_slack__('ON A GAGNÉ !!!')
 
     @staticmethod
     def __post_to_slack__(text_to_post):
