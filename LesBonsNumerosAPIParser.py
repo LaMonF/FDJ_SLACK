@@ -1,7 +1,8 @@
 import re
 import logging
-import requests
 import xml.etree.ElementTree as ET
+
+from urllib.request import Request, urlopen
 
 from Utils import Utils, NumbersInFrench
 from Result import Result
@@ -18,9 +19,10 @@ class LesBonsNumerosAPIParser(object):
         self.xml_node = None
 
     def get_data(self):
-        response = requests.get(self.API_URL)
+
+        request = Request(self.API_URL)
+        self.string_response = urlopen(request).read().decode()
         # TODO check response code
-        self.string_response = response.text
         self.xml_node = ET.fromstring(self.string_response)
         logger.debug("[LesBonsNumerosAPIParser] get_data: REPONSE >> " + self.string_response)
 

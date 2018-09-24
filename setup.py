@@ -8,9 +8,4 @@ setup(
    version=0.1,
    description='Slack FDJ script to fetch last results',
    license='MIT',
-
-   # required libs
-   install_requires=[
-       'requests'
-   ],
 )
