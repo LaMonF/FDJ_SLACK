@@ -29,7 +29,7 @@ class Result(object):
 		       (self.string_date, \
 		        " ".join(self.ordered_balls), \
 		        self.lucky_ball, \
-		        Result.__get_current_winner_string__(), \
+		        self.__get_current_winner_string__(), \
 		        self.next_lottery_date, \
 		        self.next_lottery_prize)
 
