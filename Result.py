@@ -1,12 +1,12 @@
 class Result(object):
 
 	def __init__(self,
-	             string_date=None,  # TODO replace string date with datetime object
+	             string_date='non disponible',  # TODO replace string date with datetime object
 	             balls=list(),
 	             lucky_ball=None,
 	             number_winner=0,
 	             winner_prize=0,
-	             next_lottery_string_date=None,  # TODO replace string date with datetime object
+	             next_lottery_string_date='non disponible',  # TODO replace string date with datetime object
 	             next_lottery_prize=0):
 		self.string_date = string_date
 		self.ordered_balls = balls

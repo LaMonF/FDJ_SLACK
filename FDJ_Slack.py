@@ -32,7 +32,7 @@ class FDJSlack(object):
     def __post_to_slack__(text_to_post):
         headers = {'Content-Type': 'application/json'}
         value = '{"text" : "' + text_to_post + '"}'
-        response = Request(localhost,
+        response = Request(SLACK_URL,
                            data=value.encode('utf-8'),
                            headers=headers)
         urlopen(response).read().decode()

@@ -19,7 +19,6 @@ class LesBonsNumerosAPIParser(object):
         self.xml_node = None
 
     def get_data(self):
-
         request = Request(self.API_URL)
         self.string_response = urlopen(request).read().decode()
         # TODO check response code
@@ -36,10 +35,11 @@ class LesBonsNumerosAPIParser(object):
             date = LesBonsNumerosAPIParser.__extract_date_lottery__(result_line_list[1])
             balls = LesBonsNumerosAPIParser.__extract_balls__(result_line_list[2])
             lucky_ball = LesBonsNumerosAPIParser.__extract_lucky_ball__(result_line_list[3])
-            number_winner = LesBonsNumerosAPIParser.__extract_number_winner__(result_line_list[11])
-            winner_prize = LesBonsNumerosAPIParser.__extract_winner_prize__(result_line_list[11])
-            next_lottery_date = LesBonsNumerosAPIParser.__extract_next_lottery_date__(result_line_list[12])
-            next_lottery_prize = LesBonsNumerosAPIParser.__extract_next_lottery_prize__(result_line_list[12])
+            if len(result_line_list) > 4:  # When results are not up to date len(result_line_list) == 4
+                number_winner = LesBonsNumerosAPIParser.__extract_number_winner__(result_line_list[11])
+                winner_prize = LesBonsNumerosAPIParser.__extract_winner_prize__(result_line_list[11])
+                next_lottery_date = LesBonsNumerosAPIParser.__extract_next_lottery_date__(result_line_list[12])
+                next_lottery_prize = LesBonsNumerosAPIParser.__extract_next_lottery_prize__(result_line_list[12])
 
             result = Result(string_date=date,
                             balls=balls,
