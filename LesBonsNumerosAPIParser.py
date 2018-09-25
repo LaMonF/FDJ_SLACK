@@ -69,9 +69,9 @@ class LesBonsNumerosAPIParser(object):
     @staticmethod
     def __extract_number_winner__(line):
         winner_number = -1
-        if "Le jackpot n'a pas été remporté lors de ce tirage !" in line:
+        line = line.lower()
+        if "le jackpot n'a pas été remporté lors de ce tirage !" in line:
             winner_number = 0
-            line = line.lower()
         elif NumbersInFrench.ONE in line:
             winner_number = 1
         elif NumbersInFrench.TWO in line:
