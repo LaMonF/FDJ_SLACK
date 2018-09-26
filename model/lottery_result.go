@@ -1,6 +1,7 @@
 package model
 
 import (
+	"FDJ_SLACK/utils"
 	"sort"
 	"strconv"
 	"strings"
@@ -18,26 +19,7 @@ type LotteryResult struct {
 
 func (l *LotteryResult) IsWinning(listWinningBalls []int, winningLuckyBall int) bool {
 	sort.Ints(listWinningBalls)
-	return testEq(listWinningBalls, l.Balls) && winningLuckyBall == l.LuckyBall
-}
-
-func testEq(a, b []int) bool {
-	// If one is nil, the other must also be nil.
-	if (a == nil) != (b == nil) {
-		return false
-	}
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
+	return utils.TestEq(listWinningBalls, l.Balls) && winningLuckyBall == l.LuckyBall
 }
 
 func (l *LotteryResult) String() string {

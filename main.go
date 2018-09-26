@@ -14,7 +14,6 @@ var luckWin = 5
 
 var slackURL = os.Getenv("SLACK_HOOK_URL")
 var localhost = "http://localhost:8888"
-var apiURL = "https://www.lesbonsnumeros.com/loto/rss.xml"
 
 func main() {
 	if slackURL == "" {
@@ -22,11 +21,12 @@ func main() {
 	}
 
 	p := parser.NewParser()
-	result := p.GetAndParseData(apiURL)
+	data := p.FetchData()
+	result := p.ParseData(data)
 	for index, result := range result {
 		if index == 0 { // only first result
 			l.Info(result)
-			postToSlack(slackURL, result.String())
+			// postToSlack(slackURL, result.String())
 			if result.IsWinning(win, luckWin) {
 				postToSlack(slackURL, "ON A GAGNÉ !!!")
 			}
