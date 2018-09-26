@@ -26,7 +26,7 @@ func main() {
 	for index, result := range result {
 		if index == 0 { // only first result
 			l.Info(result)
-			// postToSlack(slackURL, result.String())
+			postToSlack(slackURL, result.String())
 			if result.IsWinning(win, luckWin) {
 				postToSlack(slackURL, "ON A GAGNÉ !!!")
 			}
