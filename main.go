@@ -63,12 +63,16 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendImmediateResponseToSlack(w http.ResponseWriter, post string) {
-	message := `{"text" : "` + post + `"}`
+	l.Info("Sending back immediate response")
+	l.Info(post)
+	fmt.Fprintf(w, post) // send data to client side
 
-	var jsonStr = []byte(message)
-	w.Header().Set("Content-Type", "application/json")
-	//Write json response back to response
-	w.Write(jsonStr)
+	// message := `{"text" : "` + post + `"}`
+
+	// var jsonStr = []byte(message)
+	// w.Header().Set("Content-Type", "application/json")
+	// //Write json response back to response
+	// w.Write(jsonStr)
 }
 
 func postToSlack(slackURL string, post string) {
