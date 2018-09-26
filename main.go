@@ -4,6 +4,7 @@ import (
 	l "FDJ_SLACK/log"
 	"FDJ_SLACK/parser"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,9 +17,34 @@ var slackURL = os.Getenv("SLACK_HOOK_URL")
 var localhost = "http://localhost:8888"
 
 func main() {
+	startServer()
+}
+
+func startServer() {
+	http.HandleFunc("/lotoResult", lotoResult) // set router
+	err := http.ListenAndServe(":9090", nil)   // set listen port
+	if err != nil {
+		l.Err("ListenAndServe: ", err)
+	}
+}
+
+func lotoResult(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()       // parse arguments, you have to call this by yourself
+	fmt.Println(r.Form) // print form information in server side
+	fmt.Println("path", r.URL.Path)
+	fmt.Println("scheme", r.URL.Scheme)
+	fmt.Println(r.Form["url_long"])
+	// for k, v := range r.Form {
+	// 	fmt.Println("key:", k)
+	// 	fmt.Println("val:", strings.Join(v, ""))
+	// }
+	// fmt.Fprintf(w, "Hello astaxie!") // send data to client side
+
 	if slackURL == "" {
 		slackURL = localhost
 	}
+
+	sendImmediateResponseToSlack(w, "Fetching latest loto result")
 
 	p := parser.NewParser()
 	data := p.FetchData()
@@ -26,12 +52,23 @@ func main() {
 	for index, result := range result {
 		if index == 0 { // only first result
 			l.Info(result)
+			//We can improve this post by using the URL from the POST request
+			//See (https://api.slack.com/slash-commands -> Sending delayed responses)
 			postToSlack(slackURL, result.String())
 			if result.IsWinning(win, luckWin) {
 				postToSlack(slackURL, "ON A GAGNÉ !!!")
 			}
 		}
 	}
+}
+
+func sendImmediateResponseToSlack(w http.ResponseWriter, post string) {
+	message := `{"text" : "` + post + `"}`
+
+	var jsonStr = []byte(message)
+	w.Header().Set("Content-Type", "application/json")
+	//Write json response back to response
+	w.Write(jsonStr)
 }
 
 func postToSlack(slackURL string, post string) {
