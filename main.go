@@ -29,6 +29,8 @@ func startServer() {
 }
 
 func lotoResult(w http.ResponseWriter, r *http.Request) {
+	//Leaving this for dev purpose, we will remove it later
+	// =================
 	r.ParseForm()       // parse arguments, you have to call this by yourself
 	fmt.Println(r.Form) // print form information in server side
 	fmt.Println("path", r.URL.Path)
@@ -39,6 +41,7 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 	// 	fmt.Println("val:", strings.Join(v, ""))
 	// }
 	// fmt.Fprintf(w, "Hello astaxie!") // send data to client side
+	// =================
 
 	if slackURL == "" {
 		slackURL = localhost
@@ -54,7 +57,7 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 			l.Info(result)
 			//We can improve this post by using the URL from the POST request
 			//See (https://api.slack.com/slash-commands -> Sending delayed responses)
-			// postToSlack(slackURL, result.String())
+			postToSlack(slackURL, result.String())
 			if result.IsWinning(win, luckWin) {
 				postToSlack(slackURL, "ON A GAGNÉ !!!")
 			}
