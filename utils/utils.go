@@ -24,3 +24,33 @@ func CleanHTML(rawHTML string) string {
 	re := regexp.MustCompile(r)
 	return re.ReplaceAllString(rawHTML, "")
 }
+
+// IsWhitespace returns true if the byte slice contains only
+// whitespace characters.
+func IsWhitespace(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if c := s[i]; c != ' ' && c != '\t' && c != '\n' && c != '\r' {
+			return false
+		}
+	}
+	return true
+}
+
+func TestEq(a, b []int) bool {
+	// If one is nil, the other must also be nil.
+	if (a == nil) != (b == nil) {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}

@@ -13,6 +13,8 @@ import (
 	"github.com/etree"
 )
 
+var apiURL = "https://www.lesbonsnumeros.com/loto/rss.xml"
+
 type LesBonsNumerosAPIParser struct {
 }
 
@@ -21,7 +23,7 @@ func NewParser() *LesBonsNumerosAPIParser {
 	return s
 }
 
-func (p *LesBonsNumerosAPIParser) GetAndParseData(apiURL string) []model.LotteryResult {
+func (p *LesBonsNumerosAPIParser) FetchData() []byte {
 	l.Info("Get data from ApiURL ", apiURL)
 
 	//Get data from URL
@@ -37,12 +39,15 @@ func (p *LesBonsNumerosAPIParser) GetAndParseData(apiURL string) []model.Lottery
 		l.Error("%s", err)
 		os.Exit(1)
 	}
+	return contents
+}
 
+func (p *LesBonsNumerosAPIParser) ParseData(data []byte) []model.LotteryResult {
 	l.Info("Parsing data")
 
 	//Create new XML Document to go through results
 	doc := etree.NewDocument()
-	if err := doc.ReadFromBytes(contents); err != nil {
+	if err := doc.ReadFromBytes(data); err != nil {
 		panic(err)
 	}
 
@@ -55,7 +60,7 @@ func (p *LesBonsNumerosAPIParser) GetAndParseData(apiURL string) []model.Lottery
 			if c, ok := child.(*etree.CharData); ok {
 
 				// Manage only not empty strings
-				if !isWhitespace(c.Data) {
+				if !utils.IsWhitespace(c.Data) {
 
 					//Cleaning Result to remove any HTML tags (ex: <h1>)
 					cleanHTML := utils.CleanHTML(c.Data)
@@ -159,12 +164,22 @@ func extractNumberWinner(line string) int {
 	return winnerNumber
 }
 
-// TODO: Extract Winner prize
+// Could be done in a better way
 func extractWinnerPrize(line string) int {
-	// prize = re.findall(r'\d+', line.replace(" ",""))
-	// return 0 if len(prize) == 0 else int(prize[0])
-	l.Warning("TODO ", line)
-	return 0
+	indexBegin := strings.Index(line, "montant de") + len("montant de")
+	if indexBegin <= len("montant de") {
+		return 0
+	}
+	indexEnd := strings.Index(line, "€")
+	prizeStr := strings.Replace(line[indexBegin:indexEnd], " ", "", -1)
+	prizeStr = strings.Replace(prizeStr, "&nbsp;", "", -1)
+	prize, err := strconv.Atoi(prizeStr)
+	if err != nil {
+		// handle error
+		l.Error(err)
+		os.Exit(2)
+	}
+	return prize
 }
 
 func extractNextLotteryDate(line string) string {
@@ -173,21 +188,16 @@ func extractNextLotteryDate(line string) string {
 	return line[:index]
 }
 
-// TODO: Extract Next Lottery prize
+// Could be done in a better way
 func extractNextLotteryPrize(line string) int {
-	// Detected numbers in the line and filter when greater than 6 characters (millions)
-	// return int(list(prize for prize in re.findall(r'\d+', line.replace(" ", "")) if len(prize) > 6)[0]) // too complex
-	l.Warning("TODO ", line)
-	return 0
-}
-
-// isWhitespace returns true if the byte slice contains only
-// whitespace characters.
-func isWhitespace(s string) bool {
-	for i := 0; i < len(s); i++ {
-		if c := s[i]; c != ' ' && c != '\t' && c != '\n' && c != '\r' {
-			return false
-		}
+	indexBegin := strings.Index(line, "est de") + len("est de")
+	indexEnd := strings.Index(line, "€")
+	prizeStr := strings.Replace(line[indexBegin:indexEnd], " ", "", -1)
+	prize, err := strconv.Atoi(prizeStr)
+	if err != nil {
+		// handle error
+		l.Error(err)
+		os.Exit(2)
 	}
-	return true
+	return prize
 }
