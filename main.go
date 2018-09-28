@@ -69,8 +69,7 @@ func sendImmediateResponseToSlack(w http.ResponseWriter, post string) {
 	l.Info("Sending back immediate response")
 	// fmt.Fprintf(w, post) // send data to client side
 
-	//We set the response_type to in_channel (everyone can see it) instead of ephemeral (only you) by default
-	message := `{"response_type": "in_channel","text" : "` + post + `"}`
+	message := `{"text" : "` + post + `"}`
 	l.Info(message)
 
 	var jsonStr = []byte(message)
@@ -84,7 +83,8 @@ func sendResponseToSlack(w http.ResponseWriter, post string) {
 	l.Info("Sending back immediate response")
 	// fmt.Fprintf(w, post) // send data to client side
 
-	message := `{"text" : "` + post + `"}`
+	//We set the response_type to in_channel (everyone can see it) instead of ephemeral (only you) by default
+	message := `{"response_type": "in_channel","text" : "` + post + `"}`
 	l.Info(message)
 
 	var jsonStr = []byte(message)
