@@ -4,6 +4,7 @@ import (
 	l "FDJ_SLACK/log"
 	"FDJ_SLACK/parser"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -23,22 +24,20 @@ func main() {
 	p := parser.NewParser()
 	data := p.FetchData()
 	result := p.ParseData(data)
-	for index, result := range result {
-		if index == 0 { // only first result
-			l.Info(result)
-			postToSlack(slackURL, result.String())
-			if result.IsWinning(win, luckWin) {
-				postToSlack(slackURL, "ON A GAGNÉ !!!")
-			}
+	if len(result) > 0 {
+		r := result[0]
+		l.Info(r)
+		postToSlack(slackURL, r.String())
+		if r.IsWinning(win, luckWin) {
+			postToSlack(slackURL, "ON A GAGNÉ !!!")
 		}
 	}
 }
 
 func postToSlack(slackURL string, post string) {
-	message := `{"text" : "` + post + `"}`
+	message := fmt.Sprintf(`{"text": "%s"}`, post)
 
-	var jsonStr = []byte(message)
-	req, err := http.NewRequest("POST", slackURL, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", slackURL, bytes.NewBuffer([]byte(message)))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
