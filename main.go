@@ -47,7 +47,7 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 		slackURL = localhost
 	}
 
-	sendImmediateResponseToSlack(w, "Fetching latest loto result")
+	// sendImmediateResponseToSlack(w, "Fetching latest loto result")
 
 	p := parser.NewParser()
 	data := p.FetchData()
@@ -57,7 +57,7 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 			l.Info(result)
 			//We can improve this post by using the URL from the POST request
 			//See (https://api.slack.com/slash-commands -> Sending delayed responses)
-			postToSlack(slackURL, result.String())
+			sendResponseToSlack(w, result.String())
 			if result.IsWinning(win, luckWin) {
 				postToSlack(slackURL, "ON A GAGNÉ !!!")
 			}
@@ -66,6 +66,20 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendImmediateResponseToSlack(w http.ResponseWriter, post string) {
+	l.Info("Sending back immediate response")
+	// fmt.Fprintf(w, post) // send data to client side
+
+	message := `{"text" : "` + post + `"}`
+	l.Info(message)
+
+	var jsonStr = []byte(message)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	//Write json response back to response
+	w.Write(jsonStr)
+}
+
+func sendResponseToSlack(w http.ResponseWriter, post string) {
 	l.Info("Sending back immediate response")
 	// fmt.Fprintf(w, post) // send data to client side
 
