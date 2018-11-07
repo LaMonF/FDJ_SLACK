@@ -1,10 +1,11 @@
 package model
 
 import (
-	"FDJ_SLACK/utils"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/LaMonF/FDJ_SLACK/utils"
 )
 
 type LotteryResult struct {

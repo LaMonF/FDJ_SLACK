@@ -1,13 +1,14 @@
 package main
 
 import (
-	l "FDJ_SLACK/log"
-	"FDJ_SLACK/parser"
 	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/LaMonF/FDJ_SLACK/parser"
+	l "github.com/LaMonF/FDJ_SLACK/log"
 )
 
 var win = []int{7, 14, 22, 28, 42}
