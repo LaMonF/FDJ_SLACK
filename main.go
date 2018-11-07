@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-
 	"github.com/LaMonF/FDJ_SLACK/parser"
 	l "github.com/LaMonF/FDJ_SLACK/log"
 )
@@ -100,6 +99,7 @@ func postToSlack(slackURL string, post string) {
 
 	var jsonStr = []byte(message)
 	req, err := http.NewRequest("POST", slackURL, bytes.NewBuffer(jsonStr))
+
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
