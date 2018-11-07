@@ -10,6 +10,14 @@ import (
 	l "github.com/LaMonF/FDJ_SLACK/log"
 )
 
+
+const (
+	LOTORESULT string = "lotoResult"
+)
+
+
+const API_VERSION = 1
+
 var win = []int{7, 14, 22, 28, 42}
 var luckWin = 5
 
@@ -21,7 +29,10 @@ func main() {
 }
 
 func startServer() {
-	http.HandleFunc("/lotoResult", lotoResult) // set router
+	if slackURL == "" {
+		slackURL = localhost
+	}
+	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), lotoResult) // set router
 	err := http.ListenAndServe(":9090", nil)   // set listen port
 	if err != nil {
 		l.Err("ListenAndServe: ", err)
@@ -43,9 +54,6 @@ func lotoResult(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, "Hello astaxie!") // send data to client side
 	// =================
 
-	if slackURL == "" {
-		slackURL = localhost
-	}
 
 	// sendImmediateResponseToSlack(w, "Fetching latest loto result")
 
