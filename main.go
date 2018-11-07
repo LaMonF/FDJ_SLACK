@@ -2,12 +2,14 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"github.com/LaMonF/FDJ_SLACK/parser"
 	l "github.com/LaMonF/FDJ_SLACK/log"
+	"github.com/LaMonF/FDJ_SLACK/model"
+	"github.com/LaMonF/FDJ_SLACK/parser"
+	"github.com/LaMonF/FDJ_SLACK/utils"
+	"github.com/robfig/cron"
+	"net/http"
 )
 
 
@@ -21,103 +23,82 @@ const API_VERSION = 1
 var win = []int{7, 14, 22, 28, 42}
 var luckWin = 5
 
-var slackURL = os.Getenv("SLACK_HOOK_URL")
-var localhost = "http://localhost:8888"
+var slackURL = utils.GetEnv("SLACK_HOOK_URL", "http://localhost:8888")
 
 func main() {
 	startServer()
 }
 
 func startServer() {
-	if slackURL == "" {
-		slackURL = localhost
-	}
-	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), lotoResult) // set router
-	err := http.ListenAndServe(":9090", nil)   // set listen port
+	setUpCron()
+	setUpServer()
+}
+
+func setUpServer() {
+	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), getResultAndPostToSlack)
+	// set router
+	err := http.ListenAndServe(":9090", nil)
+	// set listen port
 	if err != nil {
 		l.Err("ListenAndServe: ", err)
 	}
 }
 
-func lotoResult(w http.ResponseWriter, r *http.Request) {
-	//Leaving this for dev purpose, we will remove it later
-	// =================
-	r.ParseForm()       // parse arguments, you have to call this by yourself
-	fmt.Println(r.Form) // print form information in server side
-	fmt.Println("path", r.URL.Path)
-	fmt.Println("scheme", r.URL.Scheme)
-	fmt.Println(r.Form["url_long"])
-	// for k, v := range r.Form {
-	// 	fmt.Println("key:", k)
-	// 	fmt.Println("val:", strings.Join(v, ""))
-	// }
-	// fmt.Fprintf(w, "Hello astaxie!") // send data to client side
-	// =================
+func setUpCron(){
+	c := cron.New()
+	c.AddFunc("0 0 21 * * *", func() { getResultAndPostToSlack(nil, nil) })
+	c.Start()
+}
 
-
-	// sendImmediateResponseToSlack(w, "Fetching latest loto result")
-
-	p := parser.NewParser()
-	data := p.FetchData()
-	result := p.ParseData(data)
-	for index, result := range result {
-		if index == 0 { // only first result
-			l.Info(result)
-			//We can improve this post by using the URL from the POST request
-			//See (https://api.slack.com/slash-commands -> Sending delayed responses)
-			sendResponseToSlack(w, result.String())
-			if result.IsWinning(win, luckWin) {
-				postToSlack(slackURL, "ON A GAGNÉ !!!")
-			}
+func getResultAndPostToSlack(w http.ResponseWriter, r *http.Request) {
+	result, err := getLotteryResult()
+	if err != nil {
+		l.Err("getResultAndPostToSlack", err)
+	} else {
+		postToSlack(result.String(), w)
+		if result.IsWinning(win, luckWin) {
+			postToSlack("ON A GAGNÉ !!!", w)
 		}
 	}
 }
 
-func sendImmediateResponseToSlack(w http.ResponseWriter, post string) {
-	l.Info("Sending back immediate response")
-	// fmt.Fprintf(w, post) // send data to client side
+func getLotteryResult() (model.LotteryResult, error){
+	p := parser.NewParser()
+	data := p.FetchData()
+	var lastResult model.LotteryResult
+	results := p.ParseData(data)
 
-	message := `{"text" : "` + post + `"}`
-	l.Info(message)
+	for index, result := range results {
+		if index == 0 { // only first result
+			l.Info(result)
+			//We can improve this post by using the URL from the POST request
+			//See (https://api.slack.com/slash-commands -> Sending delayed responses)
+			return result, nil
+		}
+	}
+	return lastResult, errors.New("Last Result not found")
+}
 
-	var jsonStr = []byte(message)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	//Write json response back to response
-	w.Write(jsonStr)
+
+func postToSlack(post string, w http.ResponseWriter) {
+	if w != nil {
+		sendResponseToSlack(w, post)
+	} else {
+		message := `{"text" : "` + post + `"}`
+		var jsonStr = []byte(message)
+		http.Post(slackURL, "application/json", bytes.NewBuffer(jsonStr))
+	}
 }
 
 func sendResponseToSlack(w http.ResponseWriter, post string) {
-	l.Info("Sending back immediate response")
-	// fmt.Fprintf(w, post) // send data to client side
-
 	//We set the response_type to in_channel (everyone can see it) instead of ephemeral (only you) by default
 	message := `{"response_type": "in_channel","text" : "` + post + `"}`
-	l.Info(message)
+
+	l.Info("Sending back response to Slack : POST --> "+ message)
 
 	var jsonStr = []byte(message)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	//Write json response back to response
 	w.Write(jsonStr)
-}
-
-func postToSlack(slackURL string, post string) {
-	message := `{"text" : "` + post + `"}`
-
-	var jsonStr = []byte(message)
-	req, err := http.NewRequest("POST", slackURL, bytes.NewBuffer(jsonStr))
-
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	//TODO: Manage response, handle errors
-	l.Info("response Body:", string(body))
 }
