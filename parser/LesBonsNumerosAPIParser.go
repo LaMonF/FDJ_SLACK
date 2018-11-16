@@ -1,16 +1,17 @@
 package parser
 
 import (
-	l "FDJ_SLACK/log"
-	"FDJ_SLACK/model"
-	"FDJ_SLACK/utils"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/etree"
+	"github.com/LaMonF/FDJ_SLACK/model"
+	l "github.com/LaMonF/FDJ_SLACK/log"
+	"github.com/LaMonF/FDJ_SLACK/utils"
+
+	"github.com/beevik/etree"
 )
 
 var apiURL = "https://www.lesbonsnumeros.com/loto/rss.xml"

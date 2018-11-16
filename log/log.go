@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/color"
+	"github.com/fatih/color"
 )
 
 var (

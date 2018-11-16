@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"regexp"
 )
 
@@ -53,4 +54,11 @@ func TestEq(a, b []int) bool {
 	}
 
 	return true
+}
+
+func GetEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
