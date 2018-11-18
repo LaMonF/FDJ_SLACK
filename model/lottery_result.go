@@ -18,12 +18,12 @@ type LotteryResult struct {
 	NextLotteryPrize int
 }
 
-func (l *LotteryResult) IsWinning(listWinningBalls []int, winningLuckyBall int) bool {
-	sort.Ints(listWinningBalls)
-	return utils.TestEq(listWinningBalls, l.Balls) && winningLuckyBall == l.LuckyBall
+func (l *LotteryResult) IsWinning(bet BetCombo) bool {
+	sort.Ints(bet.Balls)
+	return utils.TestEq(bet.Balls, l.Balls) && bet.Bonus == l.LuckyBall
 }
 
-func (l *LotteryResult) String() string {
+func (l *LotteryResult) String(bet BetCombo) string {
 	var sb strings.Builder
 
 	sb.WriteString("Résultats du ")
@@ -32,13 +32,17 @@ func (l *LotteryResult) String() string {
 
 	sb.WriteString("Numéros: ")
 	for _, ball := range l.Balls {
+		if utils.Contains(bet.Balls, ball) { sb.WriteString("*")}
 		sb.WriteString(strconv.Itoa(ball))
+		if utils.Contains(bet.Balls, ball) { sb.WriteString("*")}
 		sb.WriteString(" ")
 	}
 	sb.WriteString("\n")
 
 	sb.WriteString("Numéro chance : ")
+	if l.LuckyBall == bet.Bonus { sb.WriteString("*")}
 	sb.WriteString(strconv.Itoa(l.LuckyBall))
+	if l.LuckyBall == bet.Bonus { sb.WriteString("*")}
 	sb.WriteString("\n")
 
 	sb.WriteString(l.GetCurrentWinnerString())

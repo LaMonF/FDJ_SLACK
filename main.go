@@ -14,14 +14,17 @@ import (
 
 
 const (
-	LOTORESULT string = "lotoResult"
+	LOTORESULT string = "lotoResult";
+	BETBALLS string = "balls";
 )
 
 
 const API_VERSION = 1
 
-var win = []int{7, 14, 22, 28, 42}
-var luckWin = 5
+var myBet = model.BetCombo {
+	Balls:    []int{7, 14, 22, 28, 42},
+	Bonus:    5,
+}
 
 var slackURL = utils.GetEnv("SLACK_HOOK_URL", "http://localhost:8888")
 
@@ -36,6 +39,7 @@ func startServer() {
 
 func setUpServer() {
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), getResultAndPostToSlack)
+	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, BETBALLS), getBetBalls)
 	// set router
 	err := http.ListenAndServe(":9090", nil)
 	// set listen port
@@ -55,11 +59,15 @@ func getResultAndPostToSlack(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Err("getResultAndPostToSlack", err)
 	} else {
-		postToSlack(result.String(), w)
-		if result.IsWinning(win, luckWin) {
+		postToSlack(result.String(myBet), w)
+		if result.IsWinning(myBet) {
 			postToSlack("ON A GAGNÉ !!!", w)
 		}
 	}
+}
+
+func getBetBalls(w http.ResponseWriter, r *http.Request) {
+	postToSlack(myBet.String(), w)
 }
 
 func getLotteryResult() (model.LotteryResult, error){
