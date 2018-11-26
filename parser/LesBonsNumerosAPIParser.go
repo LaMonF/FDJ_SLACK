@@ -78,11 +78,11 @@ func (p *LesBonsNumerosAPIParser) ParseData(data []byte) []model.LotteryResult {
 					winnerPrize := 0
 					nextLotteryDate := "Unknown"
 					nextLotteryPrize := 0
-					if len(resultByLine) > 4 { // When results are not up to date len(result_line_list) == 4
+					if len(resultByLine) > 10 { // When results are not up to date len(result_line_list) < 10
 						numberWinner = extractNumberWinner(resultByLine[11])
 						winnerPrize = extractWinnerPrize(resultByLine[11])
-						nextLotteryDate = extractNextLotteryDate(resultByLine[12])
-						nextLotteryPrize = extractNextLotteryPrize(resultByLine[12])
+						nextLotteryDate = extractNextLotteryDate(resultByLine[len(resultByLine) - 2])
+						nextLotteryPrize = extractNextLotteryPrize(resultByLine[len(resultByLine) - 2])
 					}
 
 					lotteryResult := model.LotteryResult{
