@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/LaMonF/FDJ_SLACK/balance"
 	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
-	"github.com/LaMonF/FDJ_SLACK/balance"
 	"github.com/LaMonF/FDJ_SLACK/parser"
 	"github.com/LaMonF/FDJ_SLACK/utils"
 	"github.com/robfig/cron"
@@ -56,8 +56,20 @@ func setUpServer() {
 
 func setUpCron(){
 	c := cron.New()
-	c.AddFunc("0 0 21 * * *", func() { getResultAndPostToSlack(nil, nil) })
+	c.AddFunc("10 * * * * *", func() { UpdateBalance(nil, nil) })
+	//c.AddFunc("0 0 21 * * MON,WED,SAT", func() { UpdateBalance(nil, nil) })
+	c.AddFunc("0 15 21 * * *", func() { getResultAndPostToSlack(nil, nil) })
 	c.Start()
+}
+
+func UpdateBalance(w http.ResponseWriter, r *http.Request) {
+	result, err := getLotteryResult()
+	if err != nil {
+		l.Err("UpdateBalance", err)
+	} else {
+		currentBalance.updateBalance(result, myBet)
+		postToSlack(currentBalance.String(), w)
+	}
 }
 
 func getResultAndPostToSlack(w http.ResponseWriter, r *http.Request) {
