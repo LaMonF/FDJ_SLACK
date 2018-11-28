@@ -1,7 +1,6 @@
 package balance
 
 import (
-	"bufio"
 	"fmt"
 	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
@@ -12,12 +11,11 @@ import (
 	"strings"
 )
 
-const BALANCE_FILE_PATH  = "/tmp/balance.fdjSlack"
+const BALANCE_FILE_PATH  = "balance.fdjSlack"
 
 
 type Balance struct {
 	Value    	float64
-	File 		*os.File
 }
 
 func NewBalance() Balance {
@@ -25,17 +23,17 @@ func NewBalance() Balance {
 
 	file, err := os.Open(BALANCE_FILE_PATH)
 	if err != nil {
-		os.Create(BALANCE_FILE_PATH)
+		l.Error("Cannot Open file %s", BALANCE_FILE_PATH, err)
+		os.Exit(1)
 	}
-	balance.File = file
-	balance.Value = balance.readFile()
-	balance.File.Close()
+	defer file.Close()
+	balance.Value = balance.readFile(file)
 	return balance
 }
 
 
-func (b *Balance) readFile() float64 {
-	dat, err := ioutil.ReadAll(b.File)
+func (b *Balance) readFile(file *os.File) float64 {
+	dat, err := ioutil.ReadAll(file)
 	if err != nil {
 		l.Error("readFile", err)
 	}
@@ -45,10 +43,13 @@ func (b *Balance) readFile() float64 {
 }
 
 func (b *Balance) writeFile(value float64) {
-	// Create a buffered writer from the file
-	bufferedWriter := bufio.NewWriter(b.File)
-	fmt.Fprint(bufferedWriter,"%.2f", b.Value)
-	b.File.Close()
+	file, err := os.Open(BALANCE_FILE_PATH)
+	if err != nil {
+		l.Error("Cannot Open file %s", BALANCE_FILE_PATH, err)
+		os.Exit(1)
+	}
+	defer file.Close()
+	fmt.Fprintf(file,"%.2f", value)
 }
 
 func (b *Balance) String() string{
@@ -59,7 +60,7 @@ func (b *Balance) String() string{
 	return sb.String()
 }
 
-func (b *Balance) updateBalance(result model.LotteryResult, bet model.BetCombo) {
+func (b *Balance) UpdateBalance(result model.LotteryResult, bet model.BetCombo) {
 	if b.Value > 2.20 {
 		b.Value = b.Value - 2.20 // Price of a bet
 		winRankingBalance := getwinRanking(result, bet)

@@ -56,9 +56,8 @@ func setUpServer() {
 
 func setUpCron(){
 	c := cron.New()
-	c.AddFunc("10 * * * * *", func() { UpdateBalance(nil, nil) })
-	//c.AddFunc("0 0 21 * * MON,WED,SAT", func() { UpdateBalance(nil, nil) })
-	c.AddFunc("0 15 21 * * *", func() { getResultAndPostToSlack(nil, nil) })
+	c.AddFunc("0 0 22 * * MON,WED,SAT", func() { UpdateBalance(nil, nil) })
+	c.AddFunc("0 15 22 * * *", func() { getResultAndPostToSlack(nil, nil) })
 	c.Start()
 }
 
@@ -67,7 +66,7 @@ func UpdateBalance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Err("UpdateBalance", err)
 	} else {
-		currentBalance.updateBalance(result, myBet)
+		currentBalance.UpdateBalance(result, myBet)
 		postToSlack(currentBalance.String(), w)
 	}
 }
