@@ -126,3 +126,6 @@ venv.bak/
 # VsCODE
 .vscode
 debug
+FDJ_Slack
+
+*.fdjSlack

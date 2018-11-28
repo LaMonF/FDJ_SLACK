@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/LaMonF/FDJ_SLACK/balance"
 	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
 	"github.com/LaMonF/FDJ_SLACK/parser"
@@ -16,6 +17,7 @@ import (
 const (
 	LOTORESULT string = "lotoResult";
 	BETBALLS string = "balls";
+	BALANCE string = "balance";
 )
 
 
@@ -28,6 +30,8 @@ var myBet = model.BetCombo {
 
 var slackURL = utils.GetEnv("SLACK_HOOK_URL", "http://localhost:8888")
 
+var currentBalance = balance.NewBalance()
+
 func main() {
 	startServer()
 }
@@ -37,9 +41,11 @@ func startServer() {
 	setUpServer()
 }
 
+
 func setUpServer() {
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), getResultAndPostToSlack)
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, BETBALLS), getBetBalls)
+	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, BALANCE), getBalance)
 	// set router
 	err := http.ListenAndServe(":9090", nil)
 	// set listen port
@@ -50,8 +56,19 @@ func setUpServer() {
 
 func setUpCron(){
 	c := cron.New()
-	c.AddFunc("0 0 21 * * *", func() { getResultAndPostToSlack(nil, nil) })
+	c.AddFunc("0 0 22 * * MON,WED,SAT", func() { UpdateBalance(nil, nil) })
+	c.AddFunc("0 15 22 * * *", func() { getResultAndPostToSlack(nil, nil) })
 	c.Start()
+}
+
+func UpdateBalance(w http.ResponseWriter, r *http.Request) {
+	result, err := getLotteryResult()
+	if err != nil {
+		l.Err("UpdateBalance", err)
+	} else {
+		currentBalance.UpdateBalance(result, myBet)
+		postToSlack(currentBalance.String(), w)
+	}
 }
 
 func getResultAndPostToSlack(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +85,10 @@ func getResultAndPostToSlack(w http.ResponseWriter, r *http.Request) {
 
 func getBetBalls(w http.ResponseWriter, r *http.Request) {
 	postToSlack(myBet.String(), w)
+}
+
+func getBalance(w http.ResponseWriter, r *http.Request) {
+	postToSlack(currentBalance.String(), w)
 }
 
 func getLotteryResult() (model.LotteryResult, error){
