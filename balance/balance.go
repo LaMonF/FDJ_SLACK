@@ -36,7 +36,7 @@ func (b *Balance) readFile(file *os.File) float64 {
 		l.Error("readFile", err)
 	}
 	formattedString := strings.Replace(string(dat), "\n", "", -1)
-		value, _ := strconv.ParseFloat(formattedString, 64);
+	value, _ := strconv.ParseFloat(formattedString, 64);
 	return value;
 }
 
