@@ -6,11 +6,9 @@ import (
 )
 
 type BetCombo struct {
-	Balls    []int
-	Bonus    int
+	Balls []int
+	Bonus int
 }
-
-
 
 func (b *BetCombo) String() string {
 	var sb strings.Builder
@@ -28,4 +26,3 @@ func (b *BetCombo) String() string {
 
 	return sb.String()
 }
-
