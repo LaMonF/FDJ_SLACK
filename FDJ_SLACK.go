@@ -12,6 +12,7 @@ import (
 	"github.com/robfig/cron"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -74,7 +75,10 @@ func getResultAndPostToSlack(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Err("getResultAndPostToSlack", err)
 	} else {
-		postToSlack(result.String(myBet), w)
+		var b strings.Builder
+		b.WriteString(result.String(myBet))
+		b.WriteString(currentBalance.StringWinning(result, myBet))
+		postToSlack(b.String(), w)
 		if result.IsWinning(myBet) {
 			postToSlack("ON A GAGNÉ !!!", w)
 		}

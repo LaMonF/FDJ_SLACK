@@ -36,7 +36,7 @@ func (b *Balance) readFile(file *os.File) float64 {
 		l.Error("readFile", err)
 	}
 	formattedString := strings.Replace(string(dat), "\n", "", -1)
-	value, _ := strconv.ParseFloat(formattedString, 64);
+		value, _ := strconv.ParseFloat(formattedString, 64);
 	return value;
 }
 
@@ -49,6 +49,15 @@ func (b *Balance) String() string {
 	var sb strings.Builder
 	sb.WriteString("Solde courant : ")
 	sb.WriteString(strconv.FormatFloat(b.Value, 'f', 2, 64))
+	sb.WriteString(" € \n")
+	return sb.String()
+}
+
+func (b *Balance) StringWinning(l model.LotteryResult, bet model.BetCombo) string {
+	var sb strings.Builder
+	var winning = float64(getwinRanking(l, bet)) - 2.20
+	sb.WriteString("Gains : ")
+	sb.WriteString(strconv.FormatFloat(winning, 'f', 2, 64))
 	sb.WriteString(" € \n")
 	return sb.String()
 }
@@ -87,16 +96,16 @@ func getwinRanking(result model.LotteryResult, bet model.BetCombo) utils.WIN_RAN
 			return utils.RANK_1
 		}
 	} else {
-		if (occurence == 2) {
+		if occurence == 2 {
 			return utils.RANK_8
 		}
-		if (occurence == 3) {
+		if occurence == 3 {
 			return utils.RANK_6
 		}
-		if (occurence == 4) {
+		if occurence == 4 {
 			return utils.RANK_4
 		}
-		if (occurence == 5) {
+		if occurence == 5 {
 			return utils.RANK_2
 		}
 	}
