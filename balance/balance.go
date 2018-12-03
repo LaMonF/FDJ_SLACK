@@ -11,11 +11,10 @@ import (
 	"strings"
 )
 
-const BALANCE_FILE_PATH  = "balance.fdjSlack"
-
+const BALANCE_FILE_PATH = "balance.fdjSlack"
 
 type Balance struct {
-	Value    	float64
+	Value float64
 }
 
 func NewBalance() Balance {
@@ -31,28 +30,22 @@ func NewBalance() Balance {
 	return balance
 }
 
-
 func (b *Balance) readFile(file *os.File) float64 {
 	dat, err := ioutil.ReadAll(file)
 	if err != nil {
 		l.Error("readFile", err)
 	}
 	formattedString := strings.Replace(string(dat), "\n", "", -1)
-	value,_ := strconv.ParseFloat(formattedString, 64);
+	value, _ := strconv.ParseFloat(formattedString, 64);
 	return value;
 }
 
-func (b *Balance) writeFile(value float64) {
-	file, err := os.Open(BALANCE_FILE_PATH)
-	if err != nil {
-		l.Error("Cannot Open file %s", BALANCE_FILE_PATH, err)
-		os.Exit(1)
-	}
-	defer file.Close()
-	fmt.Fprintf(file,"%.2f", value)
+func (b *Balance) WriteFile(value float64) {
+	d1 := []byte(fmt.Sprintf("%.2f", value))
+	ioutil.WriteFile(BALANCE_FILE_PATH, d1, 0644)
 }
 
-func (b *Balance) String() string{
+func (b *Balance) String() string {
 	var sb strings.Builder
 	sb.WriteString("Solde courant : ")
 	sb.WriteString(strconv.FormatFloat(b.Value, 'f', 2, 64))
@@ -65,15 +58,15 @@ func (b *Balance) UpdateBalance(result model.LotteryResult, bet model.BetCombo) 
 		b.Value = b.Value - 2.20 // Price of a bet
 		winRankingBalance := getwinRanking(result, bet)
 		b.Value = b.Value + float64(winRankingBalance)
-		b.writeFile(b.Value)
-		l.Debug("New balance : "+ b.String())
+		b.WriteFile(b.Value)
+		l.Debug("New balance : " + b.String())
 	} else {
 		l.Error("Not enough money left : " + b.String())
 	}
 }
 
 func getwinRanking(result model.LotteryResult, bet model.BetCombo) utils.WIN_RANK {
-	var occurence= utils.ArrayNumberSameOccurence(result.Balls, bet.Balls)
+	var occurence = utils.ArrayNumberSameOccurence(result.Balls, bet.Balls)
 	if result.LuckyBall == bet.Bonus {
 		if occurence == 0 {
 			return utils.RANK_9
@@ -109,7 +102,3 @@ func getwinRanking(result model.LotteryResult, bet model.BetCombo) utils.WIN_RAN
 	}
 	return utils.RANK_0
 }
-
-
-
-

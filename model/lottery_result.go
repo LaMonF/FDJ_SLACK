@@ -32,17 +32,25 @@ func (l *LotteryResult) String(bet BetCombo) string {
 
 	sb.WriteString("Numéros: ")
 	for _, ball := range l.Balls {
-		if utils.Contains(bet.Balls, ball) { sb.WriteString("*")}
+		if utils.Contains(bet.Balls, ball) {
+			sb.WriteString("*")
+		}
 		sb.WriteString(strconv.Itoa(ball))
-		if utils.Contains(bet.Balls, ball) { sb.WriteString("*")}
+		if utils.Contains(bet.Balls, ball) {
+			sb.WriteString("*")
+		}
 		sb.WriteString(" ")
 	}
 	sb.WriteString("\n")
 
 	sb.WriteString("Numéro chance : ")
-	if l.LuckyBall == bet.Bonus { sb.WriteString("*")}
+	if l.LuckyBall == bet.Bonus {
+		sb.WriteString("*")
+	}
 	sb.WriteString(strconv.Itoa(l.LuckyBall))
-	if l.LuckyBall == bet.Bonus { sb.WriteString("*")}
+	if l.LuckyBall == bet.Bonus {
+		sb.WriteString("*")
+	}
 	sb.WriteString("\n")
 
 	sb.WriteString(l.GetCurrentWinnerString())

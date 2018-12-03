@@ -11,21 +11,20 @@ import (
 	"github.com/LaMonF/FDJ_SLACK/utils"
 	"github.com/robfig/cron"
 	"net/http"
+	"strconv"
 )
-
 
 const (
 	LOTORESULT string = "lotoResult";
-	BETBALLS string = "balls";
-	BALANCE string = "balance";
+	BETBALLS   string = "balls";
+	BALANCE    string = "balance";
 )
-
 
 const API_VERSION = 1
 
-var myBet = model.BetCombo {
-	Balls:    []int{7, 14, 22, 28, 42},
-	Bonus:    5,
+var myBet = model.BetCombo{
+	Balls: []int{7, 14, 22, 28, 42},
+	Bonus: 5,
 }
 
 var slackURL = utils.GetEnv("SLACK_HOOK_URL", "http://localhost:8888")
@@ -41,7 +40,6 @@ func startServer() {
 	setUpServer()
 }
 
-
 func setUpServer() {
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), getResultAndPostToSlack)
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, BETBALLS), getBetBalls)
@@ -54,10 +52,10 @@ func setUpServer() {
 	}
 }
 
-func setUpCron(){
+func setUpCron() {
 	c := cron.New()
-	c.AddFunc("0 0 22 * * MON,WED,SAT", func() { UpdateBalance(nil, nil) })
-	c.AddFunc("0 15 22 * * *", func() { getResultAndPostToSlack(nil, nil) })
+	c.AddFunc("0 15 22 * * MON,WED,SAT", func() { UpdateBalance(nil, nil) })
+	c.AddFunc("0 13 22 * * *", func() { getResultAndPostToSlack(nil, nil) })
 	c.Start()
 }
 
@@ -88,10 +86,18 @@ func getBetBalls(w http.ResponseWriter, r *http.Request) {
 }
 
 func getBalance(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	newBalance, err := strconv.ParseFloat(r.FormValue("text"), 64);
+	if err != nil {
+		l.Info("Fail to read the new balance as a Float64")
+	} else {
+		currentBalance.WriteFile(newBalance)
+		currentBalance.Value = newBalance
+	}
 	postToSlack(currentBalance.String(), w)
 }
 
-func getLotteryResult() (model.LotteryResult, error){
+func getLotteryResult() (model.LotteryResult, error) {
 	p := parser.NewParser()
 	data := p.FetchData()
 	var lastResult model.LotteryResult
@@ -108,7 +114,6 @@ func getLotteryResult() (model.LotteryResult, error){
 	return lastResult, errors.New("Last Result not found")
 }
 
-
 func postToSlack(post string, w http.ResponseWriter) {
 	if w != nil {
 		sendResponseToSlack(w, post)
@@ -123,7 +128,7 @@ func sendResponseToSlack(w http.ResponseWriter, post string) {
 	//We set the response_type to in_channel (everyone can see it) instead of ephemeral (only you) by default
 	message := `{"response_type": "in_channel","text" : "` + post + `"}`
 
-	l.Info("Sending back response to Slack : POST --> "+ message)
+	l.Info("Sending back response to Slack : POST --> " + message)
 
 	var jsonStr = []byte(message)
 	w.Header().Set("Content-Type", "application/json")

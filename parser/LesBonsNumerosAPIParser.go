@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/LaMonF/FDJ_SLACK/model"
 	l "github.com/LaMonF/FDJ_SLACK/log"
+	"github.com/LaMonF/FDJ_SLACK/model"
 	"github.com/LaMonF/FDJ_SLACK/utils"
 
 	"github.com/beevik/etree"
@@ -81,8 +81,8 @@ func (p *LesBonsNumerosAPIParser) ParseData(data []byte) []model.LotteryResult {
 					if len(resultByLine) > 10 { // When results are not up to date len(result_line_list) < 10
 						numberWinner = extractNumberWinner(resultByLine[11])
 						winnerPrize = extractWinnerPrize(resultByLine[11])
-						nextLotteryDate = extractNextLotteryDate(resultByLine[len(resultByLine) - 2])
-						nextLotteryPrize = extractNextLotteryPrize(resultByLine[len(resultByLine) - 2])
+						nextLotteryDate = extractNextLotteryDate(resultByLine[len(resultByLine)-2])
+						nextLotteryPrize = extractNextLotteryPrize(resultByLine[len(resultByLine)-2])
 					}
 
 					lotteryResult := model.LotteryResult{
