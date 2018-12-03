@@ -23,6 +23,7 @@ const BILLION = "milliard"
 // It defines the winning rank which determines the amount of winning money.
 // cf : https://github.com/LaMonF/FDJ_SLACK/issues/10
 type WIN_RANK float64
+
 const (
 	RANK_1 WIN_RANK = 2000000
 	RANK_2 WIN_RANK = 100000
