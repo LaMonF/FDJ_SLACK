@@ -13,11 +13,13 @@ import (
 
 const BALANCE_FILE_PATH = "balance.fdjSlack"
 
+var CurrentBalance = currentBalance()
+
 type Balance struct {
 	Value float64
 }
 
-func NewBalance() Balance {
+func currentBalance() Balance {
 	balance := Balance{}
 
 	file, err := os.Open(BALANCE_FILE_PATH)
@@ -41,6 +43,7 @@ func (b *Balance) readFile(file *os.File) float64 {
 }
 
 func (b *Balance) WriteFile(value float64) {
+	b.Value = value
 	d1 := []byte(fmt.Sprintf("%.2f", value))
 	ioutil.WriteFile(BALANCE_FILE_PATH, d1, 0644)
 }
