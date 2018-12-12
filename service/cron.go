@@ -4,13 +4,13 @@ import (
 	"github.com/LaMonF/FDJ_SLACK/model"
 	"net/http"
 
-	c "github.com/robfig/cron"
+	b "github.com/LaMonF/FDJ_SLACK/balance"
 	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/parser"
-	b "github.com/LaMonF/FDJ_SLACK/balance"
+	c "github.com/robfig/cron"
 )
 
-type cron struct {}
+type cron struct{}
 
 func SetUpCron() {
 	cron := c.New()
@@ -29,4 +29,3 @@ func updateBalance(w http.ResponseWriter, r *http.Request) {
 		PostToSlack(b.CurrentBalance.String(), w)
 	}
 }
-

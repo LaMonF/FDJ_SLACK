@@ -83,4 +83,3 @@ func (l *LotteryResult) GetCurrentWinnerString() string {
 	}
 	return "Le jackpot n'a pas été remporté lors de ce tirage !"
 }
-

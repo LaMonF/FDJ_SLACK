@@ -1,14 +1,14 @@
 package service
 
 import (
+	"bytes"
 	"net/http"
 	"strings"
-	"bytes"
 
-	l "github.com/LaMonF/FDJ_SLACK/log"
 	b "github.com/LaMonF/FDJ_SLACK/balance"
-	"github.com/LaMonF/FDJ_SLACK/parser"
+	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
+	"github.com/LaMonF/FDJ_SLACK/parser"
 )
 
 func Result(w http.ResponseWriter, r *http.Request) {

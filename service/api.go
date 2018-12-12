@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	l "github.com/LaMonF/FDJ_SLACK/log"
-	"github.com/LaMonF/FDJ_SLACK/utils"
 	b "github.com/LaMonF/FDJ_SLACK/balance"
+	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
+	"github.com/LaMonF/FDJ_SLACK/utils"
 )
 
 var slackURL = utils.GetEnv("SLACK_HOOK_URL", "http://localhost:8888")
@@ -21,7 +21,7 @@ const (
 	BALANCE    string = "balance";
 )
 
-type api struct {}
+type api struct{}
 
 func SetUpServer() {
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), Result)
@@ -42,7 +42,6 @@ func betBalls(w http.ResponseWriter, r *http.Request) {
 func balance(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	newBalance, err := strconv.ParseFloat(r.FormValue("text"), 64);
-
 	if err != nil {
 		l.Info("Fail to read the new balance as a Float64")
 	} else {

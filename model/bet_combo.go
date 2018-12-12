@@ -15,7 +15,6 @@ type BetCombo struct {
 	Bonus int
 }
 
-
 func (b *BetCombo) String() string {
 	var sb strings.Builder
 
