@@ -21,17 +21,18 @@ export SLACK_HOOK_URL=https://hooks.slack.com/services/YOUR/API/TOKEN
 ##### API
 Current API_VERSION `V1`
 
-| URL                     | DESCRIPTION                 |
-|-------------------------|-----------------------------|
-| /API_VERSION/lotoresult | Get the last drawn results. |
-| /API_VERSION/balls      | Get the current bet balls.  |
-| /API_VERSION/balance    | Get the current balance.    |
+| URL                          | DESCRIPTION                  | Note                         |
+|------------------------------|------------------------------|------------------------------|
+| /API_VERSION/lotoresult      | Get the last drawn results.  |                              |
+| /API_VERSION/balls           | Get the current bet balls.   |                              |
+| /API_VERSION/balance         | Get the current balance.     |                              |
+| /API_VERSION/balance  42.42  | Set the new balance to 42.42 | `float` after coma 2 numbers |
 
 
 ##### Balance Management
 The balance calculation is based on the official documentation (2018) provided by FDJ. 
 
-You can define a balance management file `balance.fdjSlack` next to your project executable.
+You must define a balance management file `balance.fdjSlack` next to your project executable.
 It handles `float64` with 2 numbers after coma. (eg: 66.66)
 
 
