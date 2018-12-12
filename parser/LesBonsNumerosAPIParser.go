@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -24,7 +25,24 @@ func NewParser() *LesBonsNumerosAPIParser {
 	return s
 }
 
-func (p *LesBonsNumerosAPIParser) FetchData() []byte {
+func (p *LesBonsNumerosAPIParser) GetLotteryResult() (model.LotteryResult, error) {
+	var lastResult model.LotteryResult
+
+	data := p.fetchData()
+	results := p.parseData(data)
+
+	for index, result := range results {
+		if index == 0 { // only first result
+			l.Info(result)
+			//We can improve this post by using the URL from the POST request
+			//See (https://api.slack.com/slash-commands -> Sending delayed responses)
+			return result, nil
+		}
+	}
+	return lastResult, errors.New("Last Result not found")
+}
+
+func (p *LesBonsNumerosAPIParser) fetchData() []byte {
 	l.Info("Get data from ApiURL ", apiURL)
 
 	//Get data from URL
@@ -43,7 +61,7 @@ func (p *LesBonsNumerosAPIParser) FetchData() []byte {
 	return contents
 }
 
-func (p *LesBonsNumerosAPIParser) ParseData(data []byte) []model.LotteryResult {
+func (p *LesBonsNumerosAPIParser) parseData(data []byte) []model.LotteryResult {
 	l.Info("Parsing data")
 
 	//Create new XML Document to go through results

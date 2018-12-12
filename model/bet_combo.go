@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+var MyBet = BetCombo{
+	Balls: []int{7, 14, 22, 28, 42},
+	Bonus: 5,
+}
+
 type BetCombo struct {
 	Balls []int
 	Bonus int

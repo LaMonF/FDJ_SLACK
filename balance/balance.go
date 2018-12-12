@@ -13,11 +13,13 @@ import (
 
 const BALANCE_FILE_PATH = "balance.fdjSlack"
 
+var CurrentBalance = currentBalance()
+
 type Balance struct {
 	Value float64
 }
 
-func NewBalance() Balance {
+func currentBalance() Balance {
 	balance := Balance{}
 
 	file, err := os.Open(BALANCE_FILE_PATH)
@@ -41,6 +43,7 @@ func (b *Balance) readFile(file *os.File) float64 {
 }
 
 func (b *Balance) WriteFile(value float64) {
+	b.Value = value
 	d1 := []byte(fmt.Sprintf("%.2f", value))
 	ioutil.WriteFile(BALANCE_FILE_PATH, d1, 0644)
 }
@@ -49,6 +52,15 @@ func (b *Balance) String() string {
 	var sb strings.Builder
 	sb.WriteString("Solde courant : ")
 	sb.WriteString(strconv.FormatFloat(b.Value, 'f', 2, 64))
+	sb.WriteString(" € \n")
+	return sb.String()
+}
+
+func (b *Balance) StringWinning(l model.LotteryResult, bet model.BetCombo) string {
+	var sb strings.Builder
+	var winning = float64(getwinRanking(l, bet)) - 2.20
+	sb.WriteString("Gains : ")
+	sb.WriteString(strconv.FormatFloat(winning, 'f', 2, 64))
 	sb.WriteString(" € \n")
 	return sb.String()
 }
@@ -87,16 +99,16 @@ func getwinRanking(result model.LotteryResult, bet model.BetCombo) utils.WIN_RAN
 			return utils.RANK_1
 		}
 	} else {
-		if (occurence == 2) {
+		if occurence == 2 {
 			return utils.RANK_8
 		}
-		if (occurence == 3) {
+		if occurence == 3 {
 			return utils.RANK_6
 		}
-		if (occurence == 4) {
+		if occurence == 4 {
 			return utils.RANK_4
 		}
-		if (occurence == 5) {
+		if occurence == 5 {
 			return utils.RANK_2
 		}
 	}
