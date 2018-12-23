@@ -2,13 +2,14 @@ package balance
 
 import (
 	"fmt"
-	l "github.com/LaMonF/FDJ_SLACK/log"
-	"github.com/LaMonF/FDJ_SLACK/model"
-	"github.com/LaMonF/FDJ_SLACK/utils"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
+
+	l "github.com/LaMonF/FDJ_SLACK/log"
+	"github.com/LaMonF/FDJ_SLACK/model"
+	"github.com/LaMonF/FDJ_SLACK/utils"
 )
 
 const BALANCE_FILE_PATH = "balance.fdjSlack"
@@ -24,7 +25,7 @@ func currentBalance() Balance {
 
 	file, err := os.Open(BALANCE_FILE_PATH)
 	if err != nil {
-		l.Error("Cannot Open file %s", BALANCE_FILE_PATH, err)
+		l.Error("Cannot Open file", BALANCE_FILE_PATH, ":", err)
 		os.Exit(1)
 	}
 	defer file.Close()
@@ -38,8 +39,8 @@ func (b *Balance) readFile(file *os.File) float64 {
 		l.Error("readFile", err)
 	}
 	formattedString := strings.Replace(string(dat), "\n", "", -1)
-	value, _ := strconv.ParseFloat(formattedString, 64);
-	return value;
+	value, _ := strconv.ParseFloat(formattedString, 64)
+	return value
 }
 
 func (b *Balance) WriteFile(value float64) {

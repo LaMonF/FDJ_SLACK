@@ -2,9 +2,9 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
@@ -28,8 +28,15 @@ func NewParser() *LesBonsNumerosAPIParser {
 func (p *LesBonsNumerosAPIParser) GetLotteryResult() (model.LotteryResult, error) {
 	var lastResult model.LotteryResult
 
-	data := p.fetchData()
-	results := p.parseData(data)
+	data, err := p.fetchData()
+	if err != nil {
+		return lastResult, err
+	}
+
+	results, err := p.parseData(data)
+	if err != nil {
+		return lastResult, err
+	}
 
 	for index, result := range results {
 		if index == 0 { // only first result
@@ -42,32 +49,30 @@ func (p *LesBonsNumerosAPIParser) GetLotteryResult() (model.LotteryResult, error
 	return lastResult, errors.New("Last Result not found")
 }
 
-func (p *LesBonsNumerosAPIParser) fetchData() []byte {
+func (p *LesBonsNumerosAPIParser) fetchData() ([]byte, error) {
 	l.Info("Get data from ApiURL ", apiURL)
 
 	//Get data from URL
 	response, err := http.Get(apiURL)
 	if err != nil {
-		l.Error("%s", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("can't fetch data: %v", err)
 	}
 
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		l.Error("%s", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("can't read fetched data: %v", err)
 	}
-	return contents
+	return contents, nil
 }
 
-func (p *LesBonsNumerosAPIParser) parseData(data []byte) []model.LotteryResult {
+func (p *LesBonsNumerosAPIParser) parseData(data []byte) ([]model.LotteryResult, error) {
 	l.Info("Parsing data")
 
 	//Create new XML Document to go through results
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(data); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	var result []model.LotteryResult
@@ -90,17 +95,28 @@ func (p *LesBonsNumerosAPIParser) parseData(data []byte) []model.LotteryResult {
 					l.Info(resultByLine)
 
 					date := extractDateLottery(resultByLine[1])
-					balls := extractBalls(resultByLine[2])
-					luckyBall := extractLuckyBall(resultByLine[3])
+					balls, err := extractBalls(resultByLine[2])
+					if err != nil {
+						return nil, err
+					}
+
+					luckyBall, err := extractLuckyBall(resultByLine[3])
+					if err != nil {
+						return nil, err
+					}
 					numberWinner := 0
 					winnerPrize := 0
 					nextLotteryDate := "Unknown"
 					nextLotteryPrize := 0
 					if len(resultByLine) > 10 { // When results are not up to date len(result_line_list) < 10
 						numberWinner = extractNumberWinner(resultByLine[11])
-						winnerPrize = extractWinnerPrize(resultByLine[11])
+						if winnerPrize, err = extractWinnerPrize(resultByLine[11]); err != nil {
+							return nil, err
+						}
 						nextLotteryDate = extractNextLotteryDate(resultByLine[len(resultByLine)-2])
-						nextLotteryPrize = extractNextLotteryPrize(resultByLine[len(resultByLine)-2])
+						if nextLotteryPrize, err = extractNextLotteryPrize(resultByLine[len(resultByLine)-2]); err != nil {
+							return nil, err
+						}
 					}
 
 					lotteryResult := model.LotteryResult{
@@ -119,14 +135,14 @@ func (p *LesBonsNumerosAPIParser) parseData(data []byte) []model.LotteryResult {
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func extractDateLottery(line string) string {
 	return line[len("Résultats du "):]
 }
 
-func extractBalls(line string) []int {
+func extractBalls(line string) ([]int, error) {
 	line = line[len("Numéros : "):]
 	ballsAsString := strings.Split(line, " - ")
 
@@ -134,24 +150,20 @@ func extractBalls(line string) []int {
 	for _, ballAsString := range ballsAsString {
 		i, err := strconv.Atoi(ballAsString)
 		if err != nil {
-			// handle error
-			l.Error(err)
-			os.Exit(2)
+			return nil, fmt.Errorf("can't extract balls: %v", err)
 		}
 		balls = append(balls, i)
 	}
-	return balls
+	return balls, nil
 }
 
-func extractLuckyBall(line string) int {
+func extractLuckyBall(line string) (int, error) {
 	luckyBallAsString := line[len("Numéro Chance : "):]
 	i, err := strconv.Atoi(luckyBallAsString)
 	if err != nil {
-		// handle error
-		l.Error(err)
-		os.Exit(2)
+		return 0, fmt.Errorf("can't extract lucky ball: %v", err)
 	}
-	return i
+	return i, nil
 }
 
 func extractNumberWinner(line string) int {
@@ -184,21 +196,19 @@ func extractNumberWinner(line string) int {
 }
 
 // Could be done in a better way
-func extractWinnerPrize(line string) int {
+func extractWinnerPrize(line string) (int, error) {
 	indexBegin := strings.Index(line, "montant de") + len("montant de")
 	if indexBegin <= len("montant de") {
-		return 0
+		return 0, nil
 	}
 	indexEnd := strings.Index(line, "€")
 	prizeStr := strings.Replace(line[indexBegin:indexEnd], " ", "", -1)
 	prizeStr = strings.Replace(prizeStr, "&nbsp;", "", -1)
 	prize, err := strconv.Atoi(prizeStr)
 	if err != nil {
-		// handle error
-		l.Error(err)
-		os.Exit(2)
+		return 0, fmt.Errorf("can't return winner prize: %v", err)
 	}
-	return prize
+	return prize, nil
 }
 
 func extractNextLotteryDate(line string) string {
@@ -208,15 +218,13 @@ func extractNextLotteryDate(line string) string {
 }
 
 // Could be done in a better way
-func extractNextLotteryPrize(line string) int {
+func extractNextLotteryPrize(line string) (int, error) {
 	indexBegin := strings.Index(line, "est de") + len("est de")
 	indexEnd := strings.Index(line, "€")
 	prizeStr := strings.Replace(line[indexBegin:indexEnd], " ", "", -1)
 	prize, err := strconv.Atoi(prizeStr)
 	if err != nil {
-		// handle error
-		l.Error(err)
-		os.Exit(2)
+		return 0, fmt.Errorf("can't extract next lottery prize: %v", err)
 	}
-	return prize
+	return prize, nil
 }

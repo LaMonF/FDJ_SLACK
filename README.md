@@ -6,7 +6,7 @@ Slack Plugin project to play with the `Française Des Jeux` Loto.
 
 You can build the project using the common go build command :
 ```go
-go build FDJ_SLACK.go
+go build
 ```
 
 ### RUN 
