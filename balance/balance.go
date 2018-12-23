@@ -2,9 +2,6 @@ package balance
 
 import (
 	"fmt"
-	l "github.com/LaMonF/FDJ_SLACK/log"
-	"github.com/LaMonF/FDJ_SLACK/model"
-	"github.com/LaMonF/FDJ_SLACK/utils"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -12,7 +9,6 @@ import (
 
 	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
-	"github.com/LaMonF/FDJ_SLACK/utils"
 )
 
 const BALANCE_FILE_PATH = "balance.fdjSlack"
