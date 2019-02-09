@@ -47,9 +47,8 @@ func balance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Info("Fail to read the new balance as a Float64")
 	} else {
-		b.CurrentBalance.WriteFile(newBalance)
+		b.CurrentBalance.SetBalanceValue(newBalance)
 	}
-
 	PostToSlack(b.CurrentBalance.String(), w)
 }
 

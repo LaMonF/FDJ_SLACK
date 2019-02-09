@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/LaMonF/FDJ_SLACK/model"
 	"net/http"
 
 	b "github.com/LaMonF/FDJ_SLACK/balance"
 	l "github.com/LaMonF/FDJ_SLACK/log"
+	"github.com/LaMonF/FDJ_SLACK/model"
 	"github.com/LaMonF/FDJ_SLACK/parser"
 	c "github.com/robfig/cron"
 )
@@ -25,7 +25,7 @@ func updateBalance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Err("UpdateBalance", err)
 	} else {
-		b.CurrentBalance.UpdateBalance(result, model.MyBet)
+		b.CurrentBalance.CalculateBalance(result, model.MyBet)
 		PostToSlack(b.CurrentBalance.String(), w)
 	}
 }
