@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	l "github.com/LaMonF/FDJ_SLACK/log"
 	"github.com/LaMonF/FDJ_SLACK/model"
@@ -15,13 +16,17 @@ import (
 	"github.com/beevik/etree"
 )
 
-var apiURL = "https://www.lesbonsnumeros.com/loto/rss.xml"
+const apiURL = "https://www.lesbonsnumeros.com/loto/rss.xml"
 
 type LesBonsNumerosAPIParser struct {
+	url string
+	httpClient  *http.Client
 }
 
-func NewParser() *LesBonsNumerosAPIParser {
-	s := &LesBonsNumerosAPIParser{}
+func NewParser() LesBonsNumerosAPIParser {
+	s := LesBonsNumerosAPIParser{}
+	s.url = apiURL
+	s.httpClient = &http.Client{Timeout: 10 * time.Second}
 	return s
 }
 
@@ -50,10 +55,10 @@ func (p *LesBonsNumerosAPIParser) GetLotteryResult() (model.LotteryResult, error
 }
 
 func (p *LesBonsNumerosAPIParser) fetchData() ([]byte, error) {
-	l.Info("Get data from ApiURL ", apiURL)
+	l.Info("Get data from ApiURL ", p.url)
 
 	//Get data from URL
-	response, err := http.Get(apiURL)
+	response, err := p.httpClient.Get(p.url)
 	if err != nil {
 		return nil, fmt.Errorf("can't fetch data: %v", err)
 	}
