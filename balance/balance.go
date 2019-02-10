@@ -68,11 +68,10 @@ func getBalanceValue(fileName string) float64 {
 	file, err := os.Open(fileName)
 	if err != nil {
 		l.Error("Cannot Open file", fileName, ":", err)
-		os.Exit(1)
+		return 0
 	}
 	defer file.Close()
-	balanceValue := readFile(file)
-	return balanceValue
+	return readFile(file)
 }
 
 // File
