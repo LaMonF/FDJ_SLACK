@@ -20,22 +20,6 @@ const THOUSAND = "mille"
 const MILLION = "million"
 const BILLION = "milliard"
 
-// It defines the winning rank which determines the amount of winning money.
-// cf : https://github.com/LaMonF/FDJ_SLACK/issues/10
-type WIN_RANK float64
-
-const (
-	RANK_1 WIN_RANK = 2000000
-	RANK_2 WIN_RANK = 100000
-	RANK_3 WIN_RANK = 1000
-	RANK_4 WIN_RANK = 500
-	RANK_5 WIN_RANK = 50
-	RANK_6 WIN_RANK = 20
-	RANK_7 WIN_RANK = 10
-	RANK_8 WIN_RANK = 5
-	RANK_9 WIN_RANK = 2.20
-	RANK_0 WIN_RANK = 0
-)
 
 func CleanHTML(rawHTML string) string {
 	r := "<.*?>"

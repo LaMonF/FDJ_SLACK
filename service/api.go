@@ -19,6 +19,7 @@ const (
 	LOTORESULT string = "lotoResult";
 	BETBALLS   string = "balls";
 	BALANCE    string = "balance";
+	PAYTABLE   string = "paytable"
 )
 
 type api struct{}
@@ -27,6 +28,7 @@ func SetUpServer() {
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, LOTORESULT), Result)
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, BETBALLS), betBalls)
 	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, BALANCE), balance)
+	http.HandleFunc(fmt.Sprintf("/%d/%s", API_VERSION, PAYTABLE), paytable)
 	// set router
 	err := http.ListenAndServe(":9090", nil)
 	// set listen port
@@ -45,8 +47,11 @@ func balance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Info("Fail to read the new balance as a Float64")
 	} else {
-		b.CurrentBalance.WriteFile(newBalance)
+		b.CurrentBalance.SetBalanceValue(newBalance)
 	}
-
 	PostToSlack(b.CurrentBalance.String(), w)
+}
+
+func paytable(w http.ResponseWriter, r *http.Request) {
+	PostToSlack(b.PaytableString(), w)
 }
