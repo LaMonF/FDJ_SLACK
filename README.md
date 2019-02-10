@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/LaMonF/FDJ_SLACK.svg?branch=master)](https://travis-ci.com/LaMonF/FDJ_SLACK)
 # FDJ_SLACK
 Slack Plugin project to play with the `Française Des Jeux` Loto.
 
