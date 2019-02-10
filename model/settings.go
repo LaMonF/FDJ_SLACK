@@ -12,6 +12,19 @@ type Settings struct {
 	CronPostSlack string   `yaml:"cron_post_slack"`
 }
 
+// Usefull for tests
+func DefaultSettings() Settings {
+	s := Settings{}
+	s.CronPostSlack = "0 13 22 * * *"
+	s.Bet = BetCombo{
+		Balls:[]int{7,14,22,28,42},
+		Bonus:5,
+	}
+	s.BetPrice = 2.20
+	s.BalanceFile = "balance.fdjSlack"
+	return s
+}
+
 func (s *Settings) String() string {
 	var sb strings.Builder
 	sb.WriteString("Ficher solde courant: " + s.BalanceFile)
