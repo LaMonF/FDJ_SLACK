@@ -35,7 +35,7 @@ func (b *Balance) SetBalanceValue(value float64) {
 
 func (b *Balance) CalculateBalance(result model.LotteryResult, bet model.BetCombo) {
 	if b.Value > conf.BET_PRICE {
-		b.Value = b.Value - conf.BET_PRICE // Price of a bet
+		b.Value = b.Value - conf.BET_PRICE
 		winRankingBalance := GetwinRanking(result, bet)
 		b.Value = b.Value + float64(winRankingBalance)
 		writeFile(b.filename, b.Value)
