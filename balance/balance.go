@@ -24,7 +24,7 @@ func NewBalance(fileName string) Balance {
 	return balance
 }
 
-var CurrentBalance = NewBalance(conf.BALANCE_FILE_PATH)
+var CurrentBalance = NewBalance(conf.Settings.BalanceFile)
 
 // PUBLIC
 
@@ -34,8 +34,8 @@ func (b *Balance) SetBalanceValue(value float64) {
 }
 
 func (b *Balance) CalculateBalance(result model.LotteryResult, bet model.BetCombo) {
-	if b.Value > conf.BET_PRICE {
-		b.Value = b.Value - conf.BET_PRICE
+	if b.Value > conf.Settings.BetPrice {
+		b.Value = b.Value - conf.Settings.BetPrice
 		winRankingBalance := GetwinRanking(result, bet)
 		b.Value = b.Value + float64(winRankingBalance)
 		writeFile(b.filename, b.Value)
@@ -55,7 +55,7 @@ func (b *Balance) String() string {
 
 func (b *Balance) StringWinning(l model.LotteryResult, bet model.BetCombo) string {
 	var sb strings.Builder
-	var winning = float64(GetwinRanking(l, bet)) - conf.BET_PRICE
+	var winning = float64(GetwinRanking(l, bet)) - conf.Settings.BetPrice
 	sb.WriteString("Gains : ")
 	sb.WriteString(strconv.FormatFloat(winning, 'f', 2, 64))
 	sb.WriteString(" € \n")

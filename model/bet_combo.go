@@ -5,14 +5,9 @@ import (
 	"strings"
 )
 
-var MyBet = BetCombo{
-	Balls: []int{7, 14, 22, 28, 42},
-	Bonus: 5,
-}
-
 type BetCombo struct {
-	Balls []int
-	Bonus int
+	Balls []int `yaml:"balls"`
+	Bonus int   `yaml:"bonus"`
 }
 
 func (b *BetCombo) String() string {
@@ -27,7 +22,6 @@ func (b *BetCombo) String() string {
 
 	sb.WriteString("Numéro chance : ")
 	sb.WriteString(strconv.Itoa(b.Bonus))
-	sb.WriteString("\n")
 
 	return sb.String()
 }

@@ -2,12 +2,12 @@ package service
 
 import (
 	"fmt"
+	"github.com/LaMonF/FDJ_SLACK/conf"
 	"net/http"
 	"strconv"
 
 	b "github.com/LaMonF/FDJ_SLACK/balance"
 	l "github.com/LaMonF/FDJ_SLACK/log"
-	"github.com/LaMonF/FDJ_SLACK/model"
 	"github.com/LaMonF/FDJ_SLACK/utils"
 )
 
@@ -38,7 +38,7 @@ func SetUpServer() {
 }
 
 func betBalls(w http.ResponseWriter, r *http.Request) {
-	PostToSlack(model.MyBet.String(), w)
+	PostToSlack(conf.Settings.Bet.String(), w)
 }
 
 func balance(w http.ResponseWriter, r *http.Request) {

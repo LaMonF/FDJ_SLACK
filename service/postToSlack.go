@@ -2,12 +2,12 @@ package service
 
 import (
 	"bytes"
+	"github.com/LaMonF/FDJ_SLACK/conf"
 	"net/http"
 	"strings"
 
 	b "github.com/LaMonF/FDJ_SLACK/balance"
 	l "github.com/LaMonF/FDJ_SLACK/log"
-	"github.com/LaMonF/FDJ_SLACK/model"
 	"github.com/LaMonF/FDJ_SLACK/parser"
 )
 
@@ -18,10 +18,10 @@ func Result(w http.ResponseWriter, r *http.Request) {
 		l.Err("getResultAndPostToSlack", err)
 	} else {
 		var builder strings.Builder
-		builder.WriteString(result.String(model.MyBet))
-		builder.WriteString(b.CurrentBalance.StringWinning(result, model.MyBet))
+		builder.WriteString(result.String(conf.Settings.Bet))
+		builder.WriteString(b.CurrentBalance.StringWinning(result, conf.Settings.Bet))
 		PostToSlack(builder.String(), w)
-		if result.IsWinning(model.MyBet) {
+		if result.IsWinning(conf.Settings.Bet) {
 			PostToSlack("ON A GAGNÉ !!!", w)
 		}
 	}
